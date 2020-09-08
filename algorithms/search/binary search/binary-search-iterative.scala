@@ -7,9 +7,9 @@ def binarySearchIterative[T <% Ordered[T]](a: Array[T], element: T): Boolean = {
   while(left <= right) {
     val mid = left + (right - left)/2
 
-    if(array(mid) == element) {
+    if(a(mid) == element) {
       return mid
-    } else if (array(mid) < element) {
+    } else if (a(mid) < element) {
       left = mid+1
     } else {
       right = mid-1
