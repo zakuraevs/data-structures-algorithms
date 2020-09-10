@@ -1,4 +1,4 @@
-def insertion_sort(array: Array[Double]) = {
+def insertionsort(array: Array[Double]) = {
 
   //for every item in the array except at index 0  
   for (j <- 1 until array.length) {

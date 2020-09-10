@@ -1,4 +1,4 @@
-def selectionSort(a: Array[Int]): Unit = {
+def selectionsort(a: Array[Int]): Unit = {
   val n = a.length
   var i = 0
 
