@@ -20,14 +20,18 @@ void solver(int n, int m, const int *p, const int *f, int &k, int *r) {
 
     // this map has elements as keys and lists of numbers of sets which contain these elements as values
     // for example values_to_sets[4] -> {0,2} implies that element 4 is present in sets 0 and 2
-    std::unordered_map<int, std::list<int> > values_to_sets;
+    std::vector< std::vector<int> > values_to_sets;
 
     // this vector contains sizes of sets of index i. Works better than an array, checked.
     std::vector< int > sets_to_sizes;
 
     // this is a priority queue which keeps track of the set with the highest size
-    // pair.first is the set size and pair.second is the set nummber
+    // pair.first is the set size and pair.second is the set number
     std::priority_queue<std::pair<int, int>> q;
+
+    for(int i = 0; i < n; i++) {
+        values_to_sets.push_back(std::vector<int>());
+    }
 
     // we fill the above data structures using f and p
     int tracker = 0;
@@ -35,90 +39,95 @@ void solver(int n, int m, const int *p, const int *f, int &k, int *r) {
         int top = p[i];
         int j = i-1;
 
-        // the set j has size 0 initially
-        //sets_to_sizes.push_back(0);
-
         // we increase the size of set j from 0 to its actual size
-        int set_size = p[i] - p[j];
+        int set_size = top - p[j];
         sets_to_sizes.push_back(set_size);
-
         // while we are looking at the same set
         while(tracker < top) {
-            // an element in the set
-            int element = f[tracker];
             // we add the number of the current set as one that contains the element
-            values_to_sets[element].push_back(j);
-            // we add the current element into the elements of the current set
-            // we increase the size of the current set by 1
+            values_to_sets[f[tracker]].push_back(j);
             tracker++;
         }
-        //value, key
+
+        // we push the pair of current set size and set number to q
         q.push(std::pair<int, int>(sets_to_sizes[j], j));
     }
-    while(!q.empty()) {
+
+    bool all_sets_empty = false;
+
+    // main algorithm loop. while we still have elements to look at and haven't covered all elements
+    while( !all_sets_empty && !(q.empty())) {
+
+        all_sets_empty = true;
+
         // getting the number of the set with largest size from q
         std::pair<int,int> largest = q.top();
+
         // the number of this set (j)
         int largest_set = largest.second;
-        //cout << "largest set " << largest_set << endl;
-        // the size of this set stored in the queue
+
+        // the size of this set stored in the queue. This might be wrong
         int largest_set_size = largest.first;
+
         //the actual size of the set j. sizes are stored and updated in sets_to_sizes
         int actual_size = sets_to_sizes[largest_set];
+
+
         // if one of these conditions is true, we discard the set from the queue and continue looping
-        if(actual_size < 1 || actual_size != largest_set_size) {
-            //cout << "fail" << endl;
+        if(actual_size != largest_set_size) {
             q.pop();
+            all_sets_empty = false;
             continue;
         }
-        // at this point we found a set which is indeed large. We remove it from queue, as details are stored in above variables
+
+        // at this point we found a set which is indeed large.
+        // We remove it from queue, as details are stored in above variables
         q.pop();
+
         // we increase the number of elements found
-        elements_found = elements_found + actual_size;
+        elements_found += actual_size;
         r[counter] = largest_set;
         counter++;
-        /*std::unordered_set<int> values_in_largest_set;
-        int j = 0;
-        while(j < actual_size) {
-            int value = f[p[largest_set]+j];
-            values_in_largest_set.insert(value);
-            j++;
-        }
-        for(int value : values_in_largest_set) {
-            while(!values_to_sets[value].empty()) {
-                int head = values_to_sets[value].front();
-                sets_to_sizes[head]--;
-                q.push(std::pair<int,int>(sets_to_sizes[head], head));
-                values_to_sets[value].pop_front();
-            }
-        }*/
+
+        // we are going to look inside f and examine all the elements in the largest set
         int j = 0;
         int limit = p[largest_set_size] - p[largest_set_size-1];
+        int p_index = p[largest_set];
+        // while we are in the largest set
+
         while(j < limit) {
-            int value = f[p[largest_set]+j];
-            //cout << "value with new method " << value << endl;
-            while(!values_to_sets[value].empty()) {
-                int head = values_to_sets[value].front();
+            int element = f[p_index+j];
+            // while this value is still stored in some elements
+            //removed_elements.push_back(element);
+
+            for(int head : values_to_sets[element]) {
+                // this is the set we are going to remove the current
+                //int head = values_to_sets[element].front();
+
+                // we decrement the size of this set
                 sets_to_sizes[head]--;
-                q.push(std::pair<int,int>(sets_to_sizes[head], head));
-                values_to_sets[value].pop_front();
+
+                // if the set is not empty, we put it into the queue once again.
+                // this is the way of updating the queue. It is now very efficient
+                // but at the beginning of each outer loop, we check if the data is correct,
+                // and if not, just pop
+                if(sets_to_sizes[head] > 0) {
+                    q.push(std::pair<int,int>(sets_to_sizes[head], head));
+                }
+                // the set no longer contains the element
             }
+            values_to_sets[element] = std::vector<int>();
             j++;
         }
-        //std::unordered_set<int> values_in_largest_set = sets[largest_set];
-        //for(int value : values_in_largest_set) {
-        //    cout << "value with old method " << value << endl;
-        //}
-        /*for(int value : values_in_largest_set) {
-            while(!values_to_sets[value].empty()) {
-                int head = values_to_sets[value].front();
-                sets_to_sizes[head]--;
-                q.push(std::pair<int,int>(sets_to_sizes[head], head));
-                values_to_sets[value].pop_front();
+        for (int i=0; i < m; i++) {
+            all_sets_empty &= (sets_to_sizes[i] == 0);
+            if (sets_to_sizes[i] > 0) {
+                break;
             }
-        }*/
+        }
     }
-    //all good here
+
+    // check if we successfuly found a set cover
     if(elements_found < n) {
         k = 0;
     } else{
