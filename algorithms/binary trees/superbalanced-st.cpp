@@ -37,7 +37,7 @@ public:
     }
 };
 
-// Recursice (2 functions below)
+// Recursive (2 functions below)
 bool traverse(const BinaryTreeNode* current, int &deepest, int &nearest, int depth) 
 {
     if(!current->left_ && !current->right_) {
@@ -97,6 +97,5 @@ bool isBalanced(const BinaryTreeNode* treeRoot)
             nodes.push(make_pair(current->left_, depth+1));
     }
     
-
     return deepest - nearest < 2;
 }
