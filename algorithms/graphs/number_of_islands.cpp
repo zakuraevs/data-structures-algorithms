@@ -5,13 +5,77 @@
 #include <stack>
 #include <vector>
 
+class Solution1 {
+private:
+    void recursiveDFS(vector<vector<char>>& grid, int row, int col) {
+        
+        // We mark the current location as visited
+        grid[row][col] = '0';
+        
+        // We need to compute the dimenstions to check boundaries
+        int rows = grid.size();
+        int cols = grid[0].size();
+        
+        // We chek all the neighbors. If any of them is land, we DFS it recursively
+        
+        // Checking North
+        if(row > 0 && grid[row-1][col] == '1')
+            recursiveDFS(grid, row-1, col);
+        
+        // Checking East
+        if(col < cols-1 && grid[row][col+1] == '1')
+            recursiveDFS(grid, row, col+1);
+            
+        // Checking South
+        if(row < rows-1 && grid[row+1][col] == '1')
+            recursiveDFS(grid, row+1, col);
+        
+            // Checking north
+        if(col > 0 && grid[row][col-1] == '1')
+            recursiveDFS(grid, row, col-1);
+    }
+    
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        
+        // We compute the dimensions of the grid
+        int rows = grid.size();
+        if(rows < 1) return 0;
+        int cols = grid[0].size();
+        if(cols < 1) return 0;
+
+        // We're going to count how many islands there are
+        int count = 0;
+        
+        // We're going to iterate over all of the rows x cols points in the grid
+        for(int row = 0; row < rows; row++) {
+            for(int col = 0; col < cols; col++) {
+                // If a point on the gird is land
+                if(grid[row][col] == '1') {
+                    // We've found a new island
+                    count++;
+                    
+                    // Now we need to mark all the land connected to the initial point above
+                    // with 0s
+                    recursiveDFS(grid, row, col);
+                    
+                }
+            }
+        }
+        
+        return count;
+    }
+};
+
+// A more verbose ans less efficient inital solution, that doesn't alter the initial grid
+
 struct pair_hash {
     inline std::size_t operator()(const std::pair<int,int> & v) const {
         return v.first*31+v.second;
     }
 };
 
-class Solution {
+class Solution2 {
 public:
     int numIslands(vector<vector<char>>& grid) {
         
