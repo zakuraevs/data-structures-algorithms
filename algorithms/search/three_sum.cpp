@@ -68,3 +68,35 @@ vector<vector<int>> threeNumberSum(vector<int> array, int targetSum) {
 	
   return res_vector;
 }
+
+// Version 2
+vector<vector<int>> threeNumberSum(vector<int> array, int targetSum) {
+
+	int n = array.size();
+	std::vector<std::vector<int>> res;
+	
+	std::sort(array.begin(), array.end());
+	
+	for(int i = 0; i < n; i++) {
+		
+		int current = array[i];
+		int left = i + 1;
+		int right = n - 1;
+		
+		while(left < right) {
+			int sum = current + array[left] + array[right];
+			if(sum == targetSum) {
+				// Sort them?
+				// They are in the sorted order, fool!
+				res.push_back({current, array[left], array[right]});
+				left++;
+				right--;
+			} else if(sum < targetSum) {
+				left++;
+			} else {
+				right--;
+			}
+		}
+	}
+  return res;
+}
