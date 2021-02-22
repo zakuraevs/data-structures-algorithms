@@ -5,6 +5,7 @@
 
 
 #include <vector>
+#include <queue>
 using namespace std;
 
 class BinaryTree {
@@ -18,6 +19,7 @@ public:
   void invertedInsert(vector<int> values, int i = 0);
 };
 
+// Recursive
 void invertBinaryTree(BinaryTree *tree) {
   
 	if(!tree) return;
@@ -28,6 +30,32 @@ void invertBinaryTree(BinaryTree *tree) {
 	BinaryTree* temporary = tree->left;
 	tree->left = tree->right;
 	tree->right = temporary;
+	
+	return;
+}
+
+// Iterative
+void invertBinaryTree(BinaryTree *tree) {
+  
+	std::queue <BinaryTree*> unvisited;
+	
+	unvisited.push(tree);
+	
+	while(!unvisited.empty()) {
+		
+		BinaryTree* current = unvisited.front();
+		unvisited.pop();
+		
+		if(current->left)
+			unvisited.push(current->left);
+		
+		if(current->right)
+			unvisited.push(current->right);
+		
+		BinaryTree* temporary = current->left;
+		current->left = current->right;
+		current->right = temporary;
+	}
 	
 	return;
 }
