@@ -1,6 +1,8 @@
 // Given a tree root and two nodes in the tree,
 // find the youngest common ancestor of the two nodes.
 // Nodes are also their own ancestors.
+
+// Access to ancestors, more than two children possible
 // O(d) time, O(1) space where d is the maximal depth of the tree.
 
 #include <vector>
@@ -62,3 +64,81 @@ AncestralTree *getYoungestCommonAncestor(AncestralTree *topAncestor,
 	
 	return one_youngest_common;
 }
+
+// No access to ancestors, binary tree
+// O(n) time and space where n is the number of nodes.
+
+#include <stack>
+#include <unordered_map>
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        
+        int p_depth;
+        int q_depth;
+        bool p_found = false;
+        bool q_found = false;
+        stack<pair<TreeNode*, int>> unvisited;
+        unordered_map<TreeNode*, TreeNode*> parents;
+        
+        unvisited.push(make_pair(root,0));
+        
+        while (!unvisited.empty() || (!p_found && !q_found)) {
+                        
+            pair<TreeNode*, int> current = unvisited.top();
+            unvisited.pop();
+            TreeNode* current_node = current.first;
+            int current_depth = current.second;
+            
+            if (current_node->val == p->val) {
+                p_depth = current_depth;
+                p_found = true;
+            }
+                
+            if (current_node->val == q->val) {
+                q_depth = current_depth;
+                q_found = true;
+            }
+            
+            if (current_node->right) {
+                unvisited.push(make_pair(current_node->right, current_depth+1));
+                parents[current_node->right] = current_node;
+            }
+            if (current_node->left) {
+                unvisited.push(make_pair(current_node->left, current_depth+1));
+                parents[current_node->left] = current_node;
+            }
+        }
+
+        TreeNode* p_youngest_common = p;
+        TreeNode* q_youngest_common = q;
+
+        while (p_depth > q_depth) {
+            p_youngest_common = parents[p_youngest_common];
+            p_depth--;
+        } 
+
+        while (q_depth > p_depth) {
+            q_youngest_common = parents[q_youngest_common];
+            q_depth--;
+        }
+
+        while (p_youngest_common->val != q_youngest_common->val) {
+            //cout << "p_youngest_common->val != q_youngest_common->val" << endl;
+            p_youngest_common = parents[p_youngest_common];
+            q_youngest_common = parents[q_youngest_common];
+        }
+
+        return p_youngest_common;
+        
+    }
+};
