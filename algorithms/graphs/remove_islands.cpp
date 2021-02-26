@@ -2,7 +2,6 @@
 // not "connected" to the border of the matrix (horiz or vert thru other 1s) with 0s
 // O(wh) time and space, w = width, h = height. 
 
-
 #include <vector>
 #include <queue>
 using namespace std;
