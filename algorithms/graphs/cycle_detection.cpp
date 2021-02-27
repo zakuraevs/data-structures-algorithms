@@ -23,9 +23,11 @@ bool dfs(const vector<vector<int>>& edges, const int& current_node,
 		
 	// 2. dfs children
 	for (int child : children) {
-		bool res = dfs(edges, child, visited, call_stack);
-		if (res)
-			return true;
+		if (!visited[child]) {
+			bool res = dfs(edges, child, visited, call_stack);
+			if (res)
+				return true;
+		}
 	}
 	
 	// 3. remove itself from call stack
