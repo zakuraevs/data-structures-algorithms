@@ -42,7 +42,7 @@ bool cycleInGraph(vector<vector<int>> edges) {
 	vector<bool> visited(num_of_nodes, false);
 	vector<bool> call_stack(num_of_nodes, false);
 	
-	for (int node = 0; node < num_of_nodes; node++) {
+	if (!visited[node]) {
 		int search_res = dfs(edges, node, visited, call_stack);
 		if (search_res)
 			return true;
